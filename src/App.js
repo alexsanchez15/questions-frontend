@@ -6,12 +6,14 @@ import QuestionList from './components/QuestionList';
 function App() {
   const [questions, setQuestions] = useState([]); //initialize as empty array
 
-  const apiUrl = `http://localhost:8080/alex`; // api uri also a const
+  const path = window.location.pathname;
+
+  const apiUrl = `http://localhost:8080${path}`; // api uri also a const
 
   // fetch questions from the site (for now using only /alex)
   const fetchQuestions = () => {
 
-    const apiUrl = `http://localhost:8080/alex`; // api uri also a const
+    const apiUrl = `http://localhost:8080${path}`; // api uri also a const
     fetch(apiUrl).then(response => response.json()).then(data => {
       setQuestions(data);
       console.log("successfully read: ", data)
@@ -21,6 +23,7 @@ function App() {
 
   //useEffect that polls for new database information every 5 seconds
   //initially fetch when componenet mounts
+  //runs furst thing. If causes an error, show error page.
   React.useEffect(() => {
     fetchQuestions();
     const intervalID = setInterval(fetchQuestions, 10000);
@@ -53,16 +56,25 @@ function App() {
     setQuestions((allQs) =>
       allQs.map((question) => {
         if (question.id === id) {
-          const updatedQ = {
-            ...question,
-            votes: question.votes + type,
-          };
-          updatedQ.changed = true;
-          setTimeout(() => {
-            updatedQ.changed = false;
-          }, 300);
-          return updatedQ;
+          const voteData = {
+            action: "vote",
+            question_id: id,
+            vote_type: (type === -1) ? "downvote" : "upvote"
+          }
+          console.log("sending data now:");
+          const jsonData = JSON.stringify(voteData);
+          postData(apiUrl, jsonData).then((response) => {
+            console.log("Server response:", response)
+          })
+            .catch((error) => {
+              console.error("failed to send voting data", error);
+            });
+
+          fetchQuestions()
+
+
         }
+
         return question;
       })
     )
