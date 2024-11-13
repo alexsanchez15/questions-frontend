@@ -2,9 +2,12 @@ import React, { useState } from 'react';
 import './App.css';
 import QuestionBox from './components/QuestionBox';
 import QuestionList from './components/QuestionList';
+import HomePage from './components/HomePage.js';
+import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 
 function App() {
   const [questions, setQuestions] = useState([]); //initialize as empty array
+  const [hasError, setHasError] = useState(false);
 
   const path = window.location.pathname;
 
@@ -14,7 +17,17 @@ function App() {
   const fetchQuestions = () => {
 
     const apiUrl = `http://localhost:8080${path}`; // api uri also a const
-    fetch(apiUrl).then(response => response.json()).then(data => {
+    if (apiUrl === `http://localhost:8080/`) {
+      return
+    }
+    fetch(apiUrl).then(response => {
+      if (!response.ok) {
+        setHasError(true);
+        throw new Error("table doesnt exist :p");
+      }
+      return response.json();
+    }).then(data => {
+
       setQuestions(data);
       console.log("successfully read: ", data)
       console.log("successfully read from:", apiUrl)
@@ -70,11 +83,11 @@ function App() {
               console.error("failed to send voting data", error);
             });
 
-          fetchQuestions()
 
 
         }
 
+        fetchQuestions()
         return question;
       })
     )
@@ -101,13 +114,23 @@ function App() {
     }
   }
 
+  if (hasError) {
+    return <div>404 - Website does not exist.</div>;
+  }
 
   return (
-    <div>
-      <h1>This is the questions app!</h1>
-      <QuestionBox addQuestion={addQuestion} />
-      <QuestionList questions={questions.sort((a, b) => b.votes - a.votes)} handleVote={handleVote} />
-    </div>
+    <Router>
+      <Routes>
+        <Route path="/" element={<HomePage />} />
+        <Route path="/*" element={
+          <div>
+            <h1>This is the questions app!</h1>
+            <QuestionBox addQuestion={addQuestion} />
+            <QuestionList questions={questions.sort((a, b) => b.votes - a.votes)} handleVote={handleVote} />
+          </div>
+        } />
+      </Routes>
+    </Router>
 
   );
 
