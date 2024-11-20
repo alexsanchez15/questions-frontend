@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import './App.css';
 import QuestionBox from './components/QuestionBox';
 import QuestionList from './components/QuestionList';
+import MakeHeading from './components/header';
 import HomePage from './components/HomePage.js';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 
@@ -11,13 +12,14 @@ function App() {
 
   const path = window.location.pathname;
 
-  const apiUrl = `http://localhost:8080${path}`; // api uri also a const
+  const apiUrl = `http://localhost:8080/api${path}`; // api uri also a const
 
   // fetch questions from the site (for now using only /alex)
   const fetchQuestions = () => {
 
-    const apiUrl = `http://localhost:8080${path}`; // api uri also a const
-    if (apiUrl === `http://localhost:8080/`) {
+    const apiUrl = `http://localhost:8080/api${path}`; // api uri also a const
+    console.log(apiUrl);
+    if (apiUrl === `http://localhost:8080/api/`) {
       return
     }
     fetch(apiUrl).then(response => {
@@ -124,7 +126,7 @@ function App() {
         <Route path="/" element={<HomePage />} />
         <Route path="/*" element={
           <div>
-            <h1>This is the questions app!</h1>
+            <MakeHeading />
             <QuestionBox addQuestion={addQuestion} />
             <QuestionList questions={questions.sort((a, b) => b.votes - a.votes)} handleVote={handleVote} />
           </div>

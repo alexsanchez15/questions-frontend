@@ -151,3 +151,17 @@ button.downvote:hover {
   background-color: #e41f26;
   /* Darker red on hover */
 }
+
+.heading-container {
+  text-align-last: center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  margin: 20px 0;
+}
+
+.heading-text {
+  font-size: 20px;
+  margin: 10px 10px;
+}
